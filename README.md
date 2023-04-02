@@ -179,6 +179,7 @@ _This bug has 2 wrong behaviors that can be fixed with the same solution. It's a
 
 
 # Bug 7: Approving a transaction won't persist the new value
+### done - changed the code so now everytime transactions are loaded, API calls are made to fetch updated data, including checkbox approved status ###
 
 _You need to fix some of the previous bugs in order to reproduce_
 
