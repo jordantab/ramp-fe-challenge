@@ -33,32 +33,37 @@ import { useCustomFetch } from "./useCustomFetch"
 //   return { data: paginatedTransactions, loading, fetchAll, invalidateData }
 // }
 export function usePaginatedTransactions(): PaginatedTransactionsResult {
-  const { fetchWithCache, loading } = useCustomFetch()
-  const [paginatedTransactions, setPaginatedTransactions] = useState<PaginatedResponse<Transaction[]> | null>(null)
+  const { fetchWithoutCache, loading } = useCustomFetch()
+  const [paginatedTransactions, setPaginatedTransactions] = useState<PaginatedResponse<
+    Transaction[]
+  > | null>(null)
 
-  const fetchAll = useCallback(async (append = true) => {
-    const response = await fetchWithCache<PaginatedResponse<Transaction[]>, PaginatedRequestParams>(
-      "paginatedTransactions",
-      {
-        page: append ? (paginatedTransactions?.nextPage ?? 0) : 0,
-      }
-    )
-
-    setPaginatedTransactions((previousResponse) => {
-      if (response === null) {
-        return response
-      }
-
-      if (append && previousResponse !== null) {
-        return {
-          data: [...previousResponse.data, ...response.data],
-          nextPage: response.nextPage,
+  const fetchAll = useCallback(
+    async (append = true) => {
+      const response = await fetchWithoutCache<PaginatedResponse<Transaction[]>, PaginatedRequestParams>(
+        "paginatedTransactions",
+        {
+          page: append ? paginatedTransactions?.nextPage ?? 0 : 0,
         }
-      }
+      )
 
-      return response
-    })
-  }, [fetchWithCache, paginatedTransactions])
+      setPaginatedTransactions((previousResponse) => {
+        if (response === null) {
+          return response
+        }
+
+        if (append && previousResponse !== null) {
+          return {
+            data: [...previousResponse.data, ...response.data],
+            nextPage: response.nextPage,
+          }
+        }
+
+        return response
+      })
+    },
+    [fetchWithoutCache, paginatedTransactions]
+  )
 
   const invalidateData = useCallback(() => {
     setPaginatedTransactions(null)
@@ -66,4 +71,3 @@ export function usePaginatedTransactions(): PaginatedTransactionsResult {
 
   return { data: paginatedTransactions, loading, fetchAll, invalidateData }
 }
-
